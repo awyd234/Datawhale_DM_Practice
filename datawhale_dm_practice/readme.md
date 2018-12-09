@@ -255,7 +255,7 @@ predict_proba()函数根据模型生成各个测试数据在各class的概率，
 
 输出
 
-    DecisionTree fit finished, score: 0.7484232655921513
+    DecisionTree fit finished, score: 0.6846531184302733
     DecisionTree fit finished, auc: 0.5942367479369453
 
 
