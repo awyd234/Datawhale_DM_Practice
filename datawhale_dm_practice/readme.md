@@ -232,7 +232,7 @@ predict_proba()函数根据模型生成各个测试数据在各class的概率，
     
     clf = SVC(random_state=2018, probability=True)
     clf.fit(x_train, y_train)
-    print('SVM fit finished, score: {}'.format(lr.score(x_test, y_test)))
+    print('SVM fit finished, score: {}'.format(clf.score(x_test, y_test)))
     predictions = clf.predict_proba(x_test)
     print('SVM fit finished, auc: {}'.format(cal_auc(y_test, predictions)))
 
@@ -249,7 +249,7 @@ predict_proba()函数根据模型生成各个测试数据在各class的概率，
     
     clf = tree.DecisionTreeClassifier(random_state=2018)
     clf.fit(x_train, y_train)
-    print('DecisionTree fit finished, score: {}'.format(lr.score(x_test, y_test)))
+    print('DecisionTree fit finished, score: {}'.format(clf.score(x_test, y_test)))
     predictions = clf.predict_proba(x_test)
     print('DecisionTree fit finished, auc: {}'.format(cal_auc(y_test, predictions)))
 
