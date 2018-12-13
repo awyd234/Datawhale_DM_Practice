@@ -18,3 +18,13 @@
 构建随机森林、GBDT、XGBoost和LightGBM这4个模型，评分方式任意。
 #### 说明链接
 [「一周算法实践」Task1.2 模型构建之集成模型 - WindTrack](http://windtrack.xyz/2018/12/10/%E3%80%8C%E4%B8%80%E5%91%A8%E7%AE%97%E6%B3%95%E5%AE%9E%E8%B7%B5%E3%80%8DTask1-2-%E6%A8%A1%E5%9E%8B%E6%9E%84%E5%BB%BA%E4%B9%8B%E9%9B%86%E6%88%90%E6%A8%A1%E5%9E%8B)
+
+### Task 2 模型评估
+
+#### 任务描述
+
+记录7个模型（在Task1的基础上）关于accuracy、precision，recall和F1-score、auc值的评分表格，并画出Roc曲线。
+
+#### 说明链接
+
+[「一周算法实践」Task2 模型评估 - WindTrack](http://windtrack.xyz/2018/12/13/%E3%80%8C%E4%B8%80%E5%91%A8%E7%AE%97%E6%B3%95%E5%AE%9E%E8%B7%B5%E3%80%8DTask2-%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/)
