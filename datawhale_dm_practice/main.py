@@ -70,7 +70,7 @@ def fit_and_evaluate_model(model, x_train_standard, y_train, x_test_standard, y_
     print("Recall: {test_recall}".format(**locals()))
     print("Auc: {test_auc_score}".format(**locals()))
 
-    # AUC曲线绘制
+    # ROC曲线绘制
     train_fprs, train_tprs, train_thresholds = metrics.roc_curve(y_train, y_train_prediction_prob[:, 1])
     test_fprs, test_tprs, test_thresholds = metrics.roc_curve(y_test, y_test_prediction_prob[:, 1])
     plt.plot(train_fprs, train_tprs)
