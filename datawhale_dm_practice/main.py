@@ -8,6 +8,7 @@ from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn import tree
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -25,9 +26,9 @@ def fit_and_evaluate_model(model, x_train_standard, y_train, x_test_standard, y_
     :param model_name: 
     :return: 
     '''
-    clf = model.fit(x_train_standard, y_train)
-
-    clf.fit(x_train_standard, y_train)
+    clf = model.fit(x_train_standard, y_train.ravel())
+    best_params = clf.best_params_
+    best_score = clf.best_score_
 
     # 模型对训练集的预测值
     y_train_prediction_value = clf.predict(x_train_standard)
@@ -56,6 +57,10 @@ def fit_and_evaluate_model(model, x_train_standard, y_train, x_test_standard, y_
     test_auc_score = metrics.roc_auc_score(y_test, y_test_prediction_prob[:, 1])
 
     print("------------------------{model_name}------------------------".format(**locals()))
+    print('''
+        best params: {best_params},
+        best_score: {best_score},
+    '''.format(**locals()))
     print("Train Set:")
     print("Accuracy: {train_accuracy_score}".format(**locals()))
     print("Precision: {train_precision_score}".format(**locals()))
@@ -89,9 +94,8 @@ def fit_and_evaluate_model(model, x_train_standard, y_train, x_test_standard, y_
 
 def main():
     data_all = pd.read_csv('data_all.csv', encoding='gbk')
-    features = [x for x in data_all.columns if x not in ['status']]
-    x = data_all[features]
-    y = data_all['status']
+    x = data_all.drop(columns=['status']).values
+    y = data_all[['status']].values
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=2018)
 
     scaler = StandardScaler()
@@ -102,27 +106,61 @@ def main():
     # x_test_standard = x_test
 
     lr = LogisticRegression(random_state=2018)
-    fit_and_evaluate_model(lr, x_train_standard, y_train, x_test_standard, y_test, 'LogisticRegression')
+    lr_grid_search_param = {
+        'C': [0.5 * _ for _ in range(1, 10, 1)]
+    }
+    grid_search = GridSearchCV(lr, param_grid=lr_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'LogisticRegression')
 
     # clf = SVC(kernel='linear', C=0.4)
     # clf = SVC(kernel='linear')
     svm_clf = SVC(random_state=2018, probability=True)
-    fit_and_evaluate_model(svm_clf, x_train_standard, y_train, x_test_standard, y_test, 'SVM')
+    svm_grid_search_param = {
+        'C': [0.5 * _ for _ in range(1, 10, 1)]
+    }
 
+    grid_search = GridSearchCV(svm_clf, param_grid=svm_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'SVM')
     dt_clf = tree.DecisionTreeClassifier(random_state=2018)
-    fit_and_evaluate_model(dt_clf, x_train_standard, y_train, x_test_standard, y_test, 'DecisionTree')
+    dt_grid_search_param = [
+        {
+            'max_depth': range(1, 20, 1),
+            'max_features': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        }
+    ]
+    grid_search = GridSearchCV(dt_clf, param_grid=dt_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'DecisionTree')
 
     random_forest_clf = RandomForestClassifier(random_state=2018)
-    fit_and_evaluate_model(random_forest_clf, x_train_standard, y_train, x_test_standard, y_test, 'RandomForest')
+    random_forest_grid_search_param = {
+        'n_estimators': range(250, 300, 5)
+    }
+    grid_search = GridSearchCV(random_forest_clf, param_grid=random_forest_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'RandomForest')
 
     gbdt_clf = GradientBoostingClassifier(random_state=2018)
-    fit_and_evaluate_model(gbdt_clf, x_train_standard, y_train, x_test_standard, y_test, 'GBDT')
+    gbdt_grid_search_param = {
+        'n_estimators': range(250, 300, 5),
+        'subsample': [0.6, 0.7, 0.75, 0.8, 0.85, 0.9]
+    }
+    grid_search = GridSearchCV(gbdt_clf, param_grid=gbdt_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'GBDT')
 
     xgbt_clf = XGBClassifier(random_state=2018)
-    fit_and_evaluate_model(xgbt_clf, x_train_standard, y_train, x_test_standard, y_test, 'XGBoost')
+    xgbt_grid_search_param = {
+        'max_depth': range(1, 5, 1),
+        'min_child_weight': range(1, 6, 1)
+    }
+    grid_search = GridSearchCV(xgbt_clf, param_grid=xgbt_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'XGBoost')
 
     light_gbm_clf = LGBMClassifier(random_state=2018)
-    fit_and_evaluate_model(light_gbm_clf, x_train_standard, y_train, x_test_standard, y_test, 'LightGBM')
+    light_gbm_grid_search_param = {
+        'max_depth': range(3, 8, 1),
+        'num_leaves': range(20, 200, 5)
+    }
+    grid_search = GridSearchCV(light_gbm_clf, param_grid=light_gbm_grid_search_param, cv=5, n_jobs=1, scoring='roc_auc')
+    fit_and_evaluate_model(grid_search, x_train_standard, y_train, x_test_standard, y_test, 'LightGBM')
 
 
 if __name__ == '__main__':
